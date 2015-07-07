@@ -36,6 +36,8 @@
    </vm>
 
    <plugins>
+      <plugin id="com.bsiag.scout.rt.ui.swing.laf.rayo.fragment"/>
+      <plugin id="com.bsiag.scout.rt.ui.swing.rayo"/>
       <plugin id="javax.xml"/>
       <plugin id="jre17.fragment" fragment="true"/>
       <plugin id="org.apache.ant"/>

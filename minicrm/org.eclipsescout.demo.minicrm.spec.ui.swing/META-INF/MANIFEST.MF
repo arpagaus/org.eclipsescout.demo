@@ -4,8 +4,6 @@ Bundle-Name: MiniCrm SPEC
 Bundle-SymbolicName: org.eclipsescout.demo.minicrm.spec.ui.swing;singleton:=true
 Bundle-Version: 5.0.0.qualifier
 Bundle-Activator: org.eclipsescout.demo.minicrm.spec.ui.swing.Activator
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.client;bundle-version="3.10.0",
  org.eclipse.scout.rt.spec.client,
@@ -16,4 +14,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.commons,
  org.junit,
  org.eclipsescout.demo.minicrm.client,
- org.eclipsescout.demo.minicrm.ui.swing
+ org.eclipsescout.demo.minicrm.ui.swing,
+ com.bsiag.scout.rt.ui.swing.rayo
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
