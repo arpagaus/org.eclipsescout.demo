@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.eclipsescout.demo.minicrm.client.extension
+Bundle-SymbolicName: org.eclipsescout.demo.minicrm.client.extension;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipsescout.demo.minicrm.client.extension.Activator
+Export-Package: org.eclipsescout.demo.minicrm.client.extension,
+ org.eclipsescout.demo.minicrm.client.extension.ui.desktop
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.rt.client;visibility:=reexport,
+ org.eclipse.scout.rt.extension.client;visibility:=reexport,
+ org.eclipsescout.demo.minicrm.shared.extension,
+ org.eclipse.scout.svg.client,
+ org.eclipsescout.demo.minicrm.client;visibility:=reexport
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: org.w3c.dom.svg;version="[1.1.0,2.0.0)"
+Bundle-ActivationPolicy: lazy

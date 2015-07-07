@@ -36,7 +36,7 @@
    </vm>
 
    <plugins>
-      <plugin id="com.bsiag.scout.rt.ui.swing.laf.rayo.fragment"/>
+      <plugin id="com.bsiag.scout.rt.ui.swing.laf.rayo.fragment" fragment="true"/>
       <plugin id="com.bsiag.scout.rt.ui.swing.rayo"/>
       <plugin id="javax.xml"/>
       <plugin id="jre17.fragment" fragment="true"/>
@@ -93,7 +93,9 @@
       <plugin id="org.eclipse.swt"/>
       <plugin id="org.eclipse.update.configurator"/>
       <plugin id="org.eclipsescout.demo.minicrm.client"/>
+      <plugin id="org.eclipsescout.demo.minicrm.client.extension"/>
       <plugin id="org.eclipsescout.demo.minicrm.shared"/>
+      <plugin id="org.eclipsescout.demo.minicrm.shared.extension"/>
       <plugin id="org.eclipsescout.demo.minicrm.spec.ui.swing"/>
       <plugin id="org.eclipsescout.demo.minicrm.ui.swing"/>
       <plugin id="org.hamcrest.core"/>

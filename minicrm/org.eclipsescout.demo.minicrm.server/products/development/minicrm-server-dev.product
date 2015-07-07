@@ -12,7 +12,8 @@
    <launcherArgs>
       <vmArgs>-Xms64m
 -Xmx512m
--XX:MaxPermSize=256m</vmArgs>
+-XX:MaxPermSize=256m
+      </vmArgs>
    </launcherArgs>
 
    <windowImages/>
@@ -63,7 +64,9 @@
       <plugin id="org.eclipse.scout.service"/>
       <plugin id="org.eclipse.update.configurator"/>
       <plugin id="org.eclipsescout.demo.minicrm.server"/>
+      <plugin id="org.eclipsescout.demo.minicrm.server.extension"/>
       <plugin id="org.eclipsescout.demo.minicrm.shared"/>
+      <plugin id="org.eclipsescout.demo.minicrm.shared.extension"/>
    </plugins>
 
 
