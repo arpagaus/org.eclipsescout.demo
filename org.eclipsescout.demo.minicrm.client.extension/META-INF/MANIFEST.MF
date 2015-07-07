@@ -5,7 +5,8 @@ Bundle-SymbolicName: org.eclipsescout.demo.minicrm.client.extension;singleton:=t
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipsescout.demo.minicrm.client.extension.Activator
 Export-Package: org.eclipsescout.demo.minicrm.client.extension,
- org.eclipsescout.demo.minicrm.client.extension.ui.desktop
+ org.eclipsescout.demo.minicrm.client.extension.ui.desktop,
+ org.eclipsescout.demo.minicrm.client.extension.ui.desktop.outlines
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.client;visibility:=reexport,
  org.eclipse.scout.rt.extension.client;visibility:=reexport,
