@@ -1,6 +1,9 @@
 package org.eclipsescout.demo.minicrm.client.extension;
 
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
+import org.eclipse.scout.service.SERVICES;
+import org.eclipsescout.demo.minicrm.client.extension.ui.desktop.outlines.pages.PersonTablePageTableExtension;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -28,6 +31,8 @@ public class Activator extends Plugin {
   public void start(BundleContext context) throws Exception {
     super.start(context);
     plugin = this;
+
+    SERVICES.getService(IExtensionRegistry.class).register(PersonTablePageTableExtension.class);
   }
 
   /*
@@ -42,7 +47,7 @@ public class Activator extends Plugin {
 
   /**
    * Returns the shared instance
-   * 
+   *
    * @return the shared instance
    */
   public static Activator getDefault() {
