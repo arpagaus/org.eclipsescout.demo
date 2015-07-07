@@ -10,12 +10,17 @@
  ******************************************************************************/
 package org.eclipsescout.demo.minicrm.shared.services.code;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeTypeWithGeneric;
+import org.eclipse.scout.rt.shared.services.common.code.CodeRow;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
 import org.eclipsescout.demo.minicrm.shared.Icons;
 
 public class CompanyRatingCodeType extends AbstractCodeTypeWithGeneric<Long, Long, ICode<Long>> {
@@ -35,6 +40,24 @@ public class CompanyRatingCodeType extends AbstractCodeTypeWithGeneric<Long, Lon
   @Override
   public Long getId() {
     return ID;
+  }
+
+  @Override
+  protected List<? extends ICodeRow<Long>> execLoadCodes(Class<? extends ICodeRow<Long>> codeRowType) throws ProcessingException {
+    List<CodeRow<Long>> list = new ArrayList<CodeRow<Long>>();
+
+    for (int i = 0; i < 4; i++) {
+      String text = String.valueOf((char) (87 + i));
+      list.add(new CodeRow<Long>(10101L + i, text));
+    }
+
+    return list;
+  }
+
+  @Override
+  protected void execOverwriteCode(ICodeRow<Long> oldCode, ICodeRow<Long> newCode) throws ProcessingException {
+    super.execOverwriteCode(oldCode, newCode);
+    newCode.setText(newCode.getText() + " (old: " + oldCode.getText() + ")");
   }
 
   @Order(10.0)
