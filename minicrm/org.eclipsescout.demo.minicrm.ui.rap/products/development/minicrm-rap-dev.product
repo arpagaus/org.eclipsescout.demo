@@ -47,6 +47,8 @@
       <plugin id="org.apache.batik.util.gui"/>
       <plugin id="org.apache.batik.xml"/>
       <plugin id="org.apache.commons.codec"/>
+      <plugin id="org.apache.commons.fileupload"/>
+      <plugin id="org.apache.commons.io"/>
       <plugin id="org.apache.commons.logging"/>
       <plugin id="org.eclipse.core.commands"/>
       <plugin id="org.eclipse.core.contenttype"/>
@@ -79,6 +81,8 @@
       <plugin id="org.eclipse.jetty.util"/>
       <plugin id="org.eclipse.osgi"/>
       <plugin id="org.eclipse.osgi.services"/>
+      <plugin id="org.eclipse.rap.filedialog"/>
+      <plugin id="org.eclipse.rap.fileupload"/>
       <plugin id="org.eclipse.rap.jface"/>
       <plugin id="org.eclipse.rap.jface.databinding"/>
       <plugin id="org.eclipse.rap.rwt"/>
@@ -105,10 +109,8 @@
       <plugin id="org.eclipse.scout.svg.ui.rap"/>
       <plugin id="org.eclipse.update.configurator"/>
       <plugin id="org.eclipsescout.demo.minicrm.client"/>
-      <plugin id="org.eclipsescout.demo.minicrm.client.extension"/>
       <plugin id="org.eclipsescout.demo.minicrm.client.mobile"/>
       <plugin id="org.eclipsescout.demo.minicrm.shared"/>
-      <plugin id="org.eclipsescout.demo.minicrm.shared.extension"/>
       <plugin id="org.eclipsescout.demo.minicrm.ui.rap"/>
       <plugin id="org.w3c.css.sac"/>
       <plugin id="org.w3c.dom.events"/>
