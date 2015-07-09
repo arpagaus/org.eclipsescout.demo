@@ -12,19 +12,26 @@ package org.eclipsescout.demo.minicrm.client.ui.desktop.form;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
+import org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable;
 import org.eclipse.scout.rt.extension.client.ui.form.fields.button.AbstractExtensibleRadioButton;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -40,10 +47,14 @@ import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryField.PedestrianButton;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryField.PublicTransportButton;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.DetailsBox;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.DetailsBox.AddToSelectionButton;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.DetailsBox.ModelField;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.MeansOfTransportBox;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.MeansOfTransportBox.TypeField;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.OkButton;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.SelectionBox;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.SelectionBox.SelectionTableField;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.SelectionBox.SelectionTableField.Table;
 import org.eclipsescout.demo.minicrm.shared.services.code.OwnVehicleCodeType;
 import org.eclipsescout.demo.minicrm.shared.services.code.PedestrianCodeType;
 import org.eclipsescout.demo.minicrm.shared.services.code.PublicTransportCodeType;
@@ -70,6 +81,10 @@ public class MobilityForm extends AbstractForm {
    */
   public void startModify() throws ProcessingException {
     startInternal(new ModifyHandler());
+  }
+
+  public AddToSelectionButton getAddToSelectionButton() {
+    return getFieldByClass(AddToSelectionButton.class);
   }
 
   public CancelButton getCancelButton() {
@@ -114,6 +129,14 @@ public class MobilityForm extends AbstractForm {
 
   public PublicTransportButton getPublicTransportButton() {
     return getFieldByClass(PublicTransportButton.class);
+  }
+
+  public SelectionBox getSelectionBox() {
+    return getFieldByClass(SelectionBox.class);
+  }
+
+  public SelectionTableField getSelectionTableField() {
+    return getFieldByClass(SelectionTableField.class);
   }
 
   public TypeField getTypeField() {
@@ -220,9 +243,15 @@ public class MobilityForm extends AbstractForm {
         protected void execChangedMasterValue(Object newMasterValue) throws ProcessingException {
           super.execChangedMasterValue(newMasterValue);
           ICodeType<Object, ?> codeType = CODES.findCodeTypeById(newMasterValue);
-          setCodeTypeClass((Class<? extends ICodeType<?, Long>>) codeType.getClass());
+          Class<? extends ICodeType<?, Long>> codeTypeClass = (Class<? extends ICodeType<?, Long>>) codeType.getClass();
 
           setValue(null);
+          setCodeTypeClass(codeTypeClass);
+
+          Table selectionTable = getSelectionTableField().getTable();
+          selectionTable.deleteAllRows();
+          selectionTable.getModelColumn().setCodeTypeClass(codeTypeClass);
+          selectionTable.getSelectionColumn().setCodeTypeClass(codeTypeClass);
         }
 
         @Override
@@ -314,6 +343,132 @@ public class MobilityForm extends AbstractForm {
             case 2:
               newNode.setVisible(false);
               break;
+          }
+        }
+      }
+
+      @Order(2000.0)
+      public class AddToSelectionButton extends AbstractButton {
+
+        @Override
+        protected int getConfiguredDisplayStyle() {
+          return DISPLAY_STYLE_LINK;
+        }
+
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("AddToSelection");
+        }
+
+        @Override
+        protected Class<? extends IValueField> getConfiguredMasterField() {
+          return MobilityForm.MainBox.DetailsBox.ModelField.class;
+        }
+
+        @Override
+        protected boolean getConfiguredMasterRequired() {
+          return true;
+        }
+
+        @Override
+        protected void execClickAction() throws ProcessingException {
+          super.execClickAction();
+
+          Set<Long> selectedModels = getModelField().getValue();
+          for (Long value : selectedModels) {
+            Table table = getSelectionTableField().getTable();
+            ITableRow row = table.createRow();
+            table.getModelColumn().setValue(row, value);
+            table.addRow(row);
+          }
+        }
+      }
+    }
+
+    @Order(4000.0)
+    public class SelectionBox extends AbstractGroupBox {
+
+      @Override
+      protected String getConfiguredLabel() {
+        return TEXTS.get("Selection");
+      }
+
+      @Order(1000.0)
+      public class SelectionTableField extends AbstractTableField<SelectionTableField.Table> {
+
+        @Override
+        protected int getConfiguredGridH() {
+          return 7;
+        }
+
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("Selection");
+        }
+
+        @Order(1000.0)
+        public class Table extends AbstractExtensibleTable {
+
+          public SelectionColumn getSelectionColumn() {
+            return getColumnSet().getColumnByClass(SelectionColumn.class);
+          }
+
+          public ModelColumn getModelColumn() {
+            return getColumnSet().getColumnByClass(ModelColumn.class);
+          }
+
+          @Order(1000.0)
+          public class ModelColumn extends AbstractSmartColumn<Long> {
+
+            @Override
+            protected String getConfiguredHeaderText() {
+              return TEXTS.get("Model");
+            }
+
+            @Override
+            protected int getConfiguredWidth() {
+              return 180;
+            }
+          }
+
+          @Order(2000.0)
+          public class SelectionColumn extends AbstractSmartColumn<Long> {
+
+            @Override
+            protected boolean getConfiguredEditable() {
+              return true;
+            }
+
+            @Override
+            protected String getConfiguredHeaderText() {
+              return TEXTS.get("Selection");
+            }
+
+            @Override
+            protected int getConfiguredWidth() {
+              return 180;
+            }
+
+            @Override
+            protected IFormField execPrepareEdit(final ITableRow row) throws ProcessingException {
+              return new AbstractSmartField<Long>() {
+
+                @Override
+                protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
+                  return ModelLookupCall.class;
+                }
+
+                @Override
+                protected void execPrepareLookup(ILookupCall<Long> call) throws ProcessingException {
+                  super.execPrepareLookup(call);
+
+                  ModelLookupCall lookupCall = (ModelLookupCall) call;
+                  lookupCall.setCodeTypeClass(getTypeField().getCodeTypeClass());
+                  lookupCall.setRootCodeId(getModelColumn().getValue(row));
+                }
+
+              };
+            }
           }
         }
       }
