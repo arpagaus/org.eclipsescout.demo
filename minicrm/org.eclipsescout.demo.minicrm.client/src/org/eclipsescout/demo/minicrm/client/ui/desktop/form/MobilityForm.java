@@ -10,22 +10,33 @@
  ******************************************************************************/
 package org.eclipsescout.demo.minicrm.client.ui.desktop.form;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.extension.client.ui.form.fields.button.AbstractExtensibleRadioButton;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.common.code.CODES;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CancelButton;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox;
-import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryGroup;
-import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryGroup.OwnVehicleButton;
-import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryGroup.PedestrianButton;
-import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryGroup.PublicTransportButton;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryField;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryField.OwnVehicleButton;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryField.PedestrianButton;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryField.PublicTransportButton;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.MeansOfTransportBox;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.MeansOfTransportBox.TypeField;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.OkButton;
 import org.eclipsescout.demo.minicrm.shared.services.code.OwnVehicleCodeType;
 import org.eclipsescout.demo.minicrm.shared.services.code.PedestrianCodeType;
@@ -59,8 +70,8 @@ public class MobilityForm extends AbstractForm {
     return getFieldByClass(CancelButton.class);
   }
 
-  public CategoryGroup getCategoryGroup() {
-    return getFieldByClass(CategoryGroup.class);
+  public CategoryField getCategoryField() {
+    return getFieldByClass(CategoryField.class);
   }
 
   public CommuteBox getCommuteBox() {
@@ -69,6 +80,10 @@ public class MobilityForm extends AbstractForm {
 
   public MainBox getMainBox() {
     return getFieldByClass(MainBox.class);
+  }
+
+  public MeansOfTransportBox getMeansOfTransportBox() {
+    return getFieldByClass(MeansOfTransportBox.class);
   }
 
   public OkButton getOkButton() {
@@ -87,6 +102,10 @@ public class MobilityForm extends AbstractForm {
     return getFieldByClass(PublicTransportButton.class);
   }
 
+  public TypeField getTypeField() {
+    return getFieldByClass(TypeField.class);
+  }
+
   @Order(1000.0)
   public class MainBox extends AbstractGroupBox {
 
@@ -99,11 +118,17 @@ public class MobilityForm extends AbstractForm {
       }
 
       @Order(1000.0)
-      public class CategoryGroup extends AbstractRadioButtonGroup<Long> {
+      public class CategoryField extends AbstractRadioButtonGroup<Long> {
 
         @Override
         protected String getConfiguredLabel() {
           return TEXTS.get("Category");
+        }
+
+        @Override
+        protected void execInitField() throws ProcessingException {
+          super.execInitField();
+          setValue(OwnVehicleCodeType.ID);
         }
 
         @Order(10.0)
@@ -150,6 +175,56 @@ public class MobilityForm extends AbstractForm {
       }
     }
 
+    @Order(2000.0)
+    public class MeansOfTransportBox extends AbstractGroupBox {
+
+      @Override
+      protected String getConfiguredLabel() {
+        return TEXTS.get("MeansOfTransport");
+      }
+
+      @Order(1000.0)
+      public class TypeField extends AbstractSmartField<Long> {
+
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("Type");
+        }
+
+        @Override
+        protected Class<? extends IValueField> getConfiguredMasterField() {
+          return MobilityForm.MainBox.CommuteBox.CategoryField.class;
+        }
+
+        @Override
+        protected boolean getConfiguredMasterRequired() {
+          return true;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void execChangedMasterValue(Object newMasterValue) throws ProcessingException {
+          super.execChangedMasterValue(newMasterValue);
+          ICodeType<Object, ?> codeType = CODES.findCodeTypeById(newMasterValue);
+          setCodeTypeClass((Class<? extends ICodeType<?, Long>>) codeType.getClass());
+
+          setValue(null);
+        }
+
+        @Override
+        protected void execFilterLookupResult(ILookupCall<Long> call, List<ILookupRow<Long>> result) throws ProcessingException {
+          super.execFilterLookupResult(call, result);
+
+          Iterator<ILookupRow<Long>> iterator = result.iterator();
+          while (iterator.hasNext()) {
+            if (iterator.next().getParentKey() != null) {
+              iterator.remove();
+            }
+          }
+        }
+      }
+    }
+
     @Order(100000.0)
     public class OkButton extends AbstractOkButton {
     }
@@ -160,5 +235,6 @@ public class MobilityForm extends AbstractForm {
   }
 
   public class ModifyHandler extends AbstractFormHandler {
+
   }
 }
