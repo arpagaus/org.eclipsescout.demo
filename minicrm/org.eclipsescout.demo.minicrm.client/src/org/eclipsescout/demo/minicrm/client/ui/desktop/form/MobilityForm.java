@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -23,18 +24,23 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.extension.client.ui.form.fields.button.AbstractExtensibleRadioButton;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipsescout.demo.minicrm.client.services.lookup.ModelLookupCall;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CancelButton;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryField;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryField.OwnVehicleButton;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryField.PedestrianButton;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.CommuteBox.CategoryField.PublicTransportButton;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.DetailsBox;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.DetailsBox.ModelField;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.MeansOfTransportBox;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.MeansOfTransportBox.TypeField;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm.MainBox.OkButton;
@@ -78,12 +84,20 @@ public class MobilityForm extends AbstractForm {
     return getFieldByClass(CommuteBox.class);
   }
 
+  public DetailsBox getDetailsBox() {
+    return getFieldByClass(DetailsBox.class);
+  }
+
   public MainBox getMainBox() {
     return getFieldByClass(MainBox.class);
   }
 
   public MeansOfTransportBox getMeansOfTransportBox() {
     return getFieldByClass(MeansOfTransportBox.class);
+  }
+
+  public ModelField getModelField() {
+    return getFieldByClass(ModelField.class);
   }
 
   public OkButton getOkButton() {
@@ -220,6 +234,86 @@ public class MobilityForm extends AbstractForm {
             if (iterator.next().getParentKey() != null) {
               iterator.remove();
             }
+          }
+        }
+      }
+    }
+
+    @Order(3000.0)
+    public class DetailsBox extends AbstractGroupBox {
+
+      @Override
+      protected String getConfiguredLabel() {
+        return TEXTS.get("Details");
+      }
+
+      @Override
+      protected Class<? extends IValueField> getConfiguredMasterField() {
+        return MobilityForm.MainBox.MeansOfTransportBox.TypeField.class;
+      }
+
+      @Override
+      protected boolean getConfiguredMasterRequired() {
+        return true;
+      }
+
+      @Order(1000.0)
+      public class ModelField extends AbstractTreeBox<Long> {
+
+        @Override
+        protected boolean getConfiguredAutoExpandAll() {
+          return true;
+        }
+
+        @Override
+        protected int getConfiguredGridH() {
+          return 7;
+        }
+
+        @Override
+        protected String getConfiguredLabel() {
+          return TEXTS.get("Model");
+        }
+
+        @Override
+        protected Class<? extends IValueField> getConfiguredMasterField() {
+          return MobilityForm.MainBox.MeansOfTransportBox.TypeField.class;
+        }
+
+        @Override
+        protected boolean getConfiguredMasterRequired() {
+          return true;
+        }
+
+        @Override
+        protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
+          return ModelLookupCall.class;
+        }
+
+        @Override
+        protected void execPrepareLookup(ILookupCall<Long> call, ITreeNode parent) throws ProcessingException {
+          super.execPrepareLookup(call, parent);
+
+          ModelLookupCall lookupCall = (ModelLookupCall) call;
+          lookupCall.setCodeTypeClass(getTypeField().getCodeTypeClass());
+          lookupCall.setRootCodeId(getTypeField().getValue());
+        }
+
+        @Override
+        protected void execFilterNewNode(ITreeNode newNode, int treeLevel) throws ProcessingException {
+          super.execFilterNewNode(newNode, treeLevel);
+
+          switch (treeLevel) {
+            case 0:
+              newNode.getCellForUpdate().setFont(FontSpec.parse("BOLD"));
+              newNode.setEnabled(false);
+              break;
+            case 1:
+              newNode.getCellForUpdate().setFont(FontSpec.parse("ITALIC"));
+              break;
+            case 2:
+              newNode.setVisible(false);
+              break;
           }
         }
       }
