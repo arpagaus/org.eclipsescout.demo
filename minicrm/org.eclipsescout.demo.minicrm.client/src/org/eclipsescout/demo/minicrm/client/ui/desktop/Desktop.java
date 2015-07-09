@@ -29,10 +29,12 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm;
+import org.eclipse.scout.rt.extension.client.ui.action.menu.AbstractExtensibleMenu;
 import org.eclipse.scout.rt.extension.client.ui.desktop.AbstractExtensibleDesktop;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipsescout.demo.minicrm.client.ClientSession;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.MobilityForm;
 import org.eclipsescout.demo.minicrm.client.ui.desktop.outlines.StandardOutline;
 import org.eclipsescout.demo.minicrm.shared.Icons;
 
@@ -156,6 +158,30 @@ public class Desktop extends AbstractExtensibleDesktop implements IDesktop {
         if (page != null) {
           page.reloadPage();
         }
+      }
+    }
+  }
+
+  @Order(1000.0)
+  public class DevMenu extends AbstractExtensibleMenu {
+
+    @Override
+    protected String getConfiguredText() {
+      return TEXTS.get("DevMenu");
+    }
+
+    @Order(1000.0)
+    public class MobilityMenu extends AbstractExtensibleMenu {
+
+      @Override
+      protected String getConfiguredText() {
+        return TEXTS.get("Mobility_");
+      }
+
+      @Override
+      protected void execAction() throws ProcessingException {
+        MobilityForm form = new MobilityForm();
+        form.startModify();
       }
     }
   }
