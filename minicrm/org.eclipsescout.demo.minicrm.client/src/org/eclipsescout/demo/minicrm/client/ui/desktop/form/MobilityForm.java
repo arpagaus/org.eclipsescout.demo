@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -251,7 +250,6 @@ public class MobilityForm extends AbstractForm {
           Table selectionTable = getSelectionTableField().getTable();
           selectionTable.deleteAllRows();
           selectionTable.getModelColumn().setCodeTypeClass(codeTypeClass);
-          selectionTable.getSelectionColumn().setCodeTypeClass(codeTypeClass);
         }
 
         @Override
@@ -402,8 +400,8 @@ public class MobilityForm extends AbstractForm {
         }
 
         @Override
-        protected String getConfiguredLabel() {
-          return TEXTS.get("Selection");
+        protected boolean getConfiguredLabelVisible() {
+          return false;
         }
 
         @Order(1000.0)
@@ -450,24 +448,17 @@ public class MobilityForm extends AbstractForm {
             }
 
             @Override
-            protected IFormField execPrepareEdit(final ITableRow row) throws ProcessingException {
-              return new AbstractSmartField<Long>() {
+            protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
+              return ModelLookupCall.class;
+            }
 
-                @Override
-                protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
-                  return ModelLookupCall.class;
-                }
+            @Override
+            protected void execPrepareLookup(ILookupCall<Long> call, ITableRow row) {
+              super.execPrepareLookup(call, row);
 
-                @Override
-                protected void execPrepareLookup(ILookupCall<Long> call) throws ProcessingException {
-                  super.execPrepareLookup(call);
-
-                  ModelLookupCall lookupCall = (ModelLookupCall) call;
-                  lookupCall.setCodeTypeClass(getTypeField().getCodeTypeClass());
-                  lookupCall.setRootCodeId(getModelColumn().getValue(row));
-                }
-
-              };
+              ModelLookupCall lookupCall = (ModelLookupCall) call;
+              lookupCall.setCodeTypeClass(getModelColumn().getCodeTypeClass());
+              lookupCall.setRootCodeId(getModelColumn().getValue(row));
             }
           }
         }
