@@ -4,6 +4,9 @@
    <extension
          name=""
          point="org.eclipse.scout.service.services">
+      <service
+            class="org.eclipsescout.demo.minicrm.client.extension.ExtensionClientStartupService">
+      </service>
    </extension>
    <extension
          point="org.eclipse.scout.rt.extension.client.desktopExtensions">
