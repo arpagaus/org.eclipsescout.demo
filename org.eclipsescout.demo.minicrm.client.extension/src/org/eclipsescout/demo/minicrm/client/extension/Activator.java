@@ -4,6 +4,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipsescout.demo.minicrm.client.extension.ui.desktop.outlines.pages.PersonTablePageTableExtension;
+import org.eclipsescout.demo.minicrm.client.ui.desktop.form.CompanyForm;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -33,6 +34,7 @@ public class Activator extends Plugin {
     plugin = this;
 
     SERVICES.getService(IExtensionRegistry.class).register(PersonTablePageTableExtension.class);
+    SERVICES.getService(IExtensionRegistry.class).registerMove(CompanyForm.MainBox.ShortNameField.class, 5.0);
   }
 
   /*
